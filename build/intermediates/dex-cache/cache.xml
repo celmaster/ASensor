@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\commons-httpclient-3.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="964cd74171f427720480efdec40a7c7f6e58426a">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\commons-httpclient-3.1_62bac48ccd3a75253b6add48016e7a9f6fda56a0.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\httpcore-4.2.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="b76bee23cd3f3ee9b98bc7c2c14670e821ddbbfd">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\httpcore-4.2.2_4da52b8621f6b3d2c14c415f8cb2164f3d72a0ca.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\WebADM.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="f6432e0ba4d5fd097229d1b63a9d193bcbb553b5">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\WebADM_f953225de86869d7f60a69a855c41959772abef6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\httpclient-4.2.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="872a71eac51131524f72f3100781dd88a42c9ccc">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\httpclient-4.2.2_8abbfd24c9f9b117b36a783264056bca7c6e98f7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\support-v4-19.1.0_15770c14c5850c375f7fc00ed9bcaf379b431d44.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\volley.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="355d92b3c1e60c648fe12bdfbc082a6c52b5b0aa">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\volley_d23ddfa4cbabea7433b56e15966ff9e0718c6ce3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\httpmime-4.2.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="92b7ae91cb55150192341962dd7254ef898768ca">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\httpmime-4.2.2_9e5c0112d1532650cb7923a453edf691f19c9597.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\libs\SimpleDataHandler.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="316f5ccfd506925b1687c2a9cccddcbe1c124f5f">
+        <dex dex="C:\Users\Marcelo\Desktop\DS\Android\Android Studio\app\build\intermediates\pre-dexed\debug\SimpleDataHandler_38d3a99bbcd76115fb3d93e449321ec572fce79f.jar" />
+    </item>
+
+</items>
