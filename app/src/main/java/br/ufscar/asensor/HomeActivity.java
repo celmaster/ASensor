@@ -29,7 +29,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.os.StrictMode;
 
-
 // declaracao da classe
 public class HomeActivity extends Activity implements BluetoothClientListener
 {
@@ -78,7 +77,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			}
 
 		// adiciona listeners aos botoes
-		Button btnBluetooth = (Button) this.findViewById(R.id.btnBluetooth);
+		final Button btnBluetooth = (Button) this.findViewById(R.id.btnBluetooth);
 		btnBluetooth.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -89,6 +88,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 					if(!Configs.SERVICE_URL.equals(""))
 					{
 						HomeActivity.this.turnOnBluetooth();
+						btHandler.activateBluetooth();
 					}else
 						{
 							DialogHandler.createAlertDialog("O endereço do serviço não foi configurado.","Aviso:", HomeActivity.this);
@@ -164,11 +164,10 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			DialogHandler.createAlertDialog("Nao foi possivel habilitar o bluetooth em seu dispositivo", "Erro: ", HomeActivity.this);
 		}else
 			{
-				DialogHandler.createAlertDialog(" (V) Bluetooth ativado.", "Aviso: ", HomeActivity.this);
+				DialogHandler.createToast("(V) Bluetooth ativado", HomeActivity.this);
 				this.expressMessage = new ExpressMessage("BUSS", Configs.SERVICE_URL);
 				this.users = new HashMap<String, Object>();
 				this.setBtnBluetoothText("Bluetooth ligado");
-				this.onRestart();
 			}
 	}
 	
@@ -182,11 +181,10 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			DialogHandler.createAlertDialog("Nao foi possivel desabilitar o bluetooth em seu dispositivo", "Erro: ", HomeActivity.this);
 		}else
 			{
-				DialogHandler.createAlertDialog(" (X) Bluetooth desativado.", "Aviso: ", HomeActivity.this);
+				DialogHandler.createToast("(X) Bluetooth desativado", HomeActivity.this);
 				this.expressMessage = null;
 				this.users = null;
 				this.setBtnBluetoothText("Bluetooth desligado");
-				
 			}
 	}
 
@@ -275,13 +273,6 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		btHandler.discoverDevices();
 	}
 
-	@Override
-	public void onRestart()
-	{
-		super.onRestart();
-		btHandler.discoverDevices();
-	}
-	
 	private void processDevice(BluetoothDevice device)
 	{
 		// processa o dispositivo de usuario corrente

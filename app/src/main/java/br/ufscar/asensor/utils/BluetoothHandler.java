@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.ParcelUuid;
 import br.ufscar.asensor.bluetooth.BluetoothClientListener;
+import android.util.Log;
 
 public class BluetoothHandler {
 
@@ -70,7 +71,8 @@ public class BluetoothHandler {
 		activity.registerReceiver(receiver, filter);
 		filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		activity.registerReceiver(receiver, filter);
-		adapter.startDiscovery();  
+		adapter.startDiscovery();
+		Log.i("<Bluetooth>","Discovery service start");
 	}
 	
 	private class BluetoothBroadcastReceiver extends BroadcastReceiver {

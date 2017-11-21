@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.Button;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import br.mb.web.expressmessage.ExpressMessage;
 import org.json.JSONObject;
 
@@ -45,6 +47,12 @@ public class DialogHandler
 		AlertDialog alertDialog = builderAlertDialog.create();
 		alertDialog.show();
 	}
+
+	public static void createToast(String message, Context context)
+    {
+        // cria um toast
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
 
 	public static void showInputDialog(final Activity context)
     {
