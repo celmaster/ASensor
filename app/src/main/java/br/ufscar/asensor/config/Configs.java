@@ -9,10 +9,18 @@ public class Configs
 	// declaracao de constantes para configurar a comunicacao com o servidor
 
 	// endereco do servidor
-	public static final String SERVER_URL = "http://192.168.1.100/";
+	public static String SERVER_URL = "";
 
 	// endereco do servico
-	public static final String SERVICE_URL = SERVER_URL + "SM/Library/Services/ExpressMessageService.php";
+	public static String SERVICE_URL = "";
+
+	// nome da aplicacao do servidor
+	public static String SERVER_NAME = "";
+
+	// campos a serem requisitados
+	public static JSONArray FIELDS = null;
+
+
 
 	// metodos estaticos
 	public static JSONObject getDataRequest() throws JSONException
@@ -24,11 +32,11 @@ public class Configs
 		JSONArray fields = new JSONArray();  	// informa os dados que serao solicitados ao dispositivo destinatario
 
 		// dados solicitados
-		fields.put("EmotionalState");
+		fields.put(Configs.FIELDS);
 
 		// informacoes do ASensor
-		info.put("app_name", "usersEmotionApp");
-		info.put("mac_address", "usersEmotionApp");
+		info.put("app_name", Configs.SERVER_NAME);
+		info.put("mac_address",Configs.SERVER_NAME);
 		info.put("profile_fields", fields);
 
 		// requisicao

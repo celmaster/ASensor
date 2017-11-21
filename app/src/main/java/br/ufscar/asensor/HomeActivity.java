@@ -21,11 +21,14 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.os.StrictMode;
+
 
 // declaracao da classe
 public class HomeActivity extends Activity implements BluetoothClientListener
@@ -42,44 +45,93 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);		
 		
-		// desbloqueia a interface de rede para trocar dados via HTTP
-		ExpressMessage.unlockGuardPolicy();
-		
-		this.btHandler = BluetoothHandler.getBluetoothHandlerInstance(this, this);
-		
-		
-		// verifica se o bluetooth esta habilitado e caso negativo, solicita sua habilitacao ao usuario
-		if(!btHandler.getBluetoothStatus())
-		{
-			DialogHandler.createAlertDialog("Seu dispositivo esta com o bluetooth desligado.", "Aviso: ", HomeActivity.this);
-			this.setBtnBluetoothText("Bluetooth desligado");
-		}else
-			{				
-				this.expressMessage = new ExpressMessage("ASensor", Configs.SERVICE_URL);
-				this.users = new HashMap<String, Object>(); 
-				this.setBtnBluetoothText("Bluetooth ligado");
-			}
-		
-		// adiciona um listener ao botao
-		Button btnBluetooth = (Button) this.findViewById(R.id.btnBluetooth); 
-		
-		btnBluetooth.setOnClickListener(new OnClickListener(){		
+		// habilita a interface de rede para trocar dados via HTTP
+		this.enableExternalConnection();
 
+		// inicializa as configuracoes
+		this.init();
+
+		// inicializa atributos
+		this.btHandler = BluetoothHandler.getBluetoothHandlerInstance(this, this);
+		this.expressMessage = null;
+	}
+
+	public void init()
+	{
+		// inicializa as configuracoes da aplicacao
+		// declaracao de variaveis
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+		// desliga o bluetooth caso as configuracoes do servidor nao tenham sido especificadas
+		if(Configs.SERVICE_URL.equals(""))
+		{
+			if (bluetoothAdapter.isEnabled()) {
+				this.turnOffBluetooth();
+			}
+		}else
+			{
+				// liga o bluetooth
+				if (!bluetoothAdapter.isEnabled())
+				{
+					this.turnOnBluetooth();
+				}
+			}
+
+		// adiciona listeners aos botoes
+		Button btnBluetooth = (Button) this.findViewById(R.id.btnBluetooth);
+		btnBluetooth.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				// verifica o status do bluetooth
 				if(!HomeActivity.this.btHandler.getBluetoothStatus())
 				{
-					HomeActivity.this.turnOnBluetooth();
-				}else
+					// ativa o bluetooth somente se as configuracoes do servidor foram definidas
+					if(!Configs.SERVICE_URL.equals(""))
 					{
+						HomeActivity.this.turnOnBluetooth();
+					}else
+						{
+							DialogHandler.createAlertDialog("O endereço do serviço não foi configurado.","Aviso:", HomeActivity.this);
+						}
+				}else
+				{
 					HomeActivity.this.turnOffBluetooth();
-					}
-				
+				}
+
 			}
 		});
-		
-		
+
+		Button btnConfig = (Button) this.findViewById(R.id.btnConfig);
+		btnConfig.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				HomeActivity.this.setConfigurations();
+			}
+		});
+
+		Button btnInfo = (Button) this.findViewById(R.id.btnInfo);
+		btnInfo.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+
+				// exibe informacoes do servidor somente se suas configuracoes forem definidas
+				if(!Configs.SERVICE_URL.equals("")) {
+					DialogHandler.createAlertDialog("Nome da aplicacao: " + Configs.SERVER_NAME
+									+ "Campos requisitados: " + Configs.FIELDS.toString()
+							, "\n\nDados do servidor", HomeActivity.this);
+				}else
+					{
+						DialogHandler.createAlertDialog("O endereço do serviço não foi configurado.","Aviso:", HomeActivity.this);
+					}
+			}
+		});
+	}
+
+	public void enableExternalConnection()
+	{
+		// habilita a conexao via http
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 	}
 	
 	public void setBtnBluetoothText(String text)
@@ -116,6 +168,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 				this.expressMessage = new ExpressMessage("BUSS", Configs.SERVICE_URL);
 				this.users = new HashMap<String, Object>();
 				this.setBtnBluetoothText("Bluetooth ligado");
+				this.onRestart();
 			}
 	}
 	
@@ -129,45 +182,20 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			DialogHandler.createAlertDialog("Nao foi possivel desabilitar o bluetooth em seu dispositivo", "Erro: ", HomeActivity.this);
 		}else
 			{
-				DialogHandler.createAlertDialog(" (X) Bluetooth desativado.", "Aviso: ", HomeActivity.this);						
+				DialogHandler.createAlertDialog(" (X) Bluetooth desativado.", "Aviso: ", HomeActivity.this);
 				this.expressMessage = null;
 				this.users = null;
 				this.setBtnBluetoothText("Bluetooth desligado");
 				
 			}
 	}
-	
-	public void warningBluetoothEnabled()
+
+	public void setConfigurations()
 	{
-		// cria um aviso para ao usu�rio notificando-o que o Bluetooth est� desabilitado e tenta pergunta ao usuario se deseja ativa-lo
-		AlertDialog.Builder builderAlertDialog = new AlertDialog.Builder(this);
-		builderAlertDialog.setMessage("A comunicacao com a interface\nde rede Bluetooth esta\ndesabilitada").setTitle("Atencao:");
-		builderAlertDialog.setPositiveButton(R.string.ativar, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// ativa o Bluetooth
-				BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-				if(!adapter.enable())
-				{
-					DialogHandler.createAlertDialog("Nao foi possivel habilitar o bluetooth em seu dispositivo", "Erro: ", HomeActivity.this);
-				}
-			}
-		});
-		builderAlertDialog.setNegativeButton(R.string.naoAtivar, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// apenas mantem o atributo logico como falso
-				DialogHandler.createAlertDialog("O funcionamento do sensor sera prejudicado", "Aviso: ", HomeActivity.this);
-			}
-		});
-		
-		AlertDialog alertDialog = builderAlertDialog.create();
-		alertDialog.show();
+		// configura os dados de acesso ao express message
+		DialogHandler.showInputDialog(this);
 	}
-	
-			
+
 	@Override
 	public void retrieveBluetoothDevicesSet(Set<BluetoothDevice> devicesAroundMe, Exception exception)
 	{	 		
@@ -246,6 +274,13 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		btHandler = BluetoothHandler.getBluetoothHandlerInstance(this, this);
 		btHandler.discoverDevices();
 	}
+
+	@Override
+	public void onRestart()
+	{
+		super.onRestart();
+		btHandler.discoverDevices();
+	}
 	
 	private void processDevice(BluetoothDevice device)
 	{
@@ -274,7 +309,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 					"    \"clean\": \"true\"" +
 					"}";
 			
-			this.expressMessage.post(Configs.APP_NAME, jsonData);
+			this.expressMessage.post(Configs.SERVER_NAME, jsonData);
 			Log.i("<CleanAdaptation>","Limpa os dados da adaptacao");
 	        
 		}catch(Exception e)

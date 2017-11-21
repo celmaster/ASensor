@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="server_url">Endereço do serviço Express Message</string>
     <string name="app_name">ASensor</string>    
     <string name="action_settings">Settings</string>
     <string name="ativar">Ativar</string>
     <string name="naoAtivar">Não ativar</string>
     <string name="descript">Logotipo do aplicativo ASensor</string>
-    <color name="black">#1A1A1A</color>
-    <color name="dodgeblue">#1E90FF</color>
+    <color name="whitesmoke">#F8F8FF</color>
+    <color name="forestgreen">#228B22</color>
 
 </resources>
