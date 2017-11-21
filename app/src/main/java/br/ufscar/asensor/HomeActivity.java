@@ -117,8 +117,15 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 				// exibe informacoes do servidor somente se suas configuracoes forem definidas
 				if(!Configs.SERVICE_URL.equals("")) {
 					DialogHandler.createAlertDialog("Nome da aplicacao: " + Configs.SERVER_NAME
-									+ "Campos requisitados: " + Configs.FIELDS.toString()
+									+ "\n\nCampos requisitados: " + Configs.FIELDS.toString()
 							, "\n\nDados do servidor", HomeActivity.this);
+					try
+					{
+						Log.i("<DadosRequisitados>", Configs.getDataRequest().toString());
+					}catch(Exception e)
+						{
+							Log.e("error",e.getMessage());
+						}
 				}else
 					{
 						DialogHandler.createAlertDialog("O endereço do serviço não foi configurado.","Aviso:", HomeActivity.this);
