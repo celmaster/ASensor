@@ -16,18 +16,16 @@ import br.ufscar.asensor.bluetooth.BluetoothClientListener;
 import br.ufscar.asensor.config.Configs;
 import br.ufscar.asensor.utils.BluetoothHandler;
 import br.ufscar.asensor.utils.DialogHandler;
+import br.ufscar.asensor.utils.NetworkTool;
+
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.os.StrictMode;
 
 // declaracao da classe
 public class HomeActivity extends Activity implements BluetoothClientListener
@@ -45,7 +43,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		setContentView(R.layout.activity_home);		
 		
 		// habilita a interface de rede para trocar dados via HTTP
-		this.enableExternalConnection();
+		NetworkTool.enableExternalConnection();
 
 		// inicializa as configuracoes
 		this.init();
@@ -77,6 +75,8 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			}
 
 		// adiciona listeners aos botoes
+
+		// botao do bluetooth
 		final Button btnBluetooth = (Button) this.findViewById(R.id.btnBluetooth);
 		btnBluetooth.setOnClickListener(new OnClickListener(){
 			@Override
@@ -88,7 +88,6 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 					if(!Configs.SERVICE_URL.equals(""))
 					{
 						HomeActivity.this.turnOnBluetooth();
-						btHandler.activateBluetooth();
 					}else
 						{
 							DialogHandler.createAlertDialog("O endereço do serviço não foi configurado.","Aviso:", HomeActivity.this);
@@ -101,6 +100,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			}
 		});
 
+		// botao de configuracoes
 		Button btnConfig = (Button) this.findViewById(R.id.btnConfig);
 		btnConfig.setOnClickListener(new OnClickListener(){
 			@Override
@@ -109,6 +109,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 			}
 		});
 
+		// botao de informacoes
 		Button btnInfo = (Button) this.findViewById(R.id.btnInfo);
 		btnInfo.setOnClickListener(new OnClickListener(){
 			@Override
@@ -134,13 +135,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		});
 	}
 
-	public void enableExternalConnection()
-	{
-		// habilita a conexao via http
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy);
-	}
-	
+
 	public void setBtnBluetoothText(String text)
 	{
 		// altera o texto do botao do bluetooth
@@ -164,17 +159,28 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 	public void turnOnBluetooth()
 	{
 		// liga o bluetooth
-		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();	
-		
-		if(!adapter.enable())
+		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		if(adapter == null)
 		{
-			DialogHandler.createAlertDialog("Nao foi possivel habilitar o bluetooth em seu dispositivo", "Erro: ", HomeActivity.this);
+			DialogHandler.createAlertDialog("Nao foi possivel habilitar o bluetooth em seu dispositivo",
+										       "Erro: ", HomeActivity.this);
 		}else
 			{
-				DialogHandler.createToast("(V) Bluetooth ativado", HomeActivity.this);
-				this.expressMessage = new ExpressMessage("BUSS", Configs.SERVICE_URL);
-				this.users = new HashMap<String, Object>();
-				this.setBtnBluetoothText("Bluetooth ligado");
+				if(!adapter.isEnabled())
+				{
+					// habilita o bluetooth
+					btHandler.activateBluetooth();
+					DialogHandler.createToast("(V) Habilitando bluetooth", HomeActivity.this);
+
+					// configura a instancia do ExpressMessage para troca de dados via http
+					this.expressMessage = new ExpressMessage(Configs.SERVER_NAME, Configs.SERVICE_URL);
+
+					// inicializa a tabela de usuarios
+					this.users = new HashMap<String, Object>();
+
+					// troca a mensagem do botao ligar/desligar bluetooth
+					this.setBtnBluetoothText("Desligar bluetooth");
+				}
 			}
 	}
 	
@@ -183,15 +189,26 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		// liga o bluetooth
 		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		
-		if(!adapter.disable())
+		if(adapter == null)
 		{
 			DialogHandler.createAlertDialog("Nao foi possivel desabilitar o bluetooth em seu dispositivo", "Erro: ", HomeActivity.this);
 		}else
 			{
-				DialogHandler.createToast("(X) Bluetooth desativado", HomeActivity.this);
-				this.expressMessage = null;
-				this.users = null;
-				this.setBtnBluetoothText("Bluetooth desligado");
+				if(adapter.isEnabled())
+				{
+					// desabilita o bluetooth
+					adapter.disable();
+					DialogHandler.createToast("(X) Desabilitando o Blutooth", HomeActivity.this);
+
+					// destroi a instancia para o ExpressMessxage
+					this.expressMessage = null;
+
+					// destroi a tabela de usuarios
+					this.users = null;
+
+					// troca a mensagem do botao ligar/desligar bluetooth
+					this.setBtnBluetoothText("Ligar Bluetooth");
+				}
 			}
 	}
 
@@ -250,7 +267,7 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 					this.users = null;
 					this.users = new HashMap<String, Object>();
 					
-					// inicializa a interface do BUSS caso nao haja algum usuario sendo atendido
+					// inicializa a interface da aplicacao caso nao haja algum usuario sendo atendido
 					if(this.hasUser)
 					{
 						this.sendProfileDefault();
@@ -286,9 +303,12 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		// faz a requisicao de perfil
 		try
 		{
-			this.expressMessage.post(device.getAddress(), Configs.getDataRequest().toString());
-			this.users.put(device.getAddress(), "dadosDoPerfil");	
-			this.hasUser = true;
+			if(NetworkTool.getConnectionStatus(HomeActivity.this))
+			{
+				this.expressMessage.post(device.getAddress(), Configs.getDataRequest().toString());
+				this.users.put(device.getAddress(), "dadosDoPerfil");
+				this.hasUser = true;
+			}
 		}catch(Exception e)
 			 {
 				e.printStackTrace();
@@ -302,13 +322,15 @@ public class HomeActivity extends Activity implements BluetoothClientListener
 		// declaracao de variaveis
 		try
 		{
-			
-			String jsonData = "{\n" +
-					"    \"clean\": \"true\"" +
-					"}";
-			
-			this.expressMessage.post(Configs.SERVER_NAME, jsonData);
-			Log.i("<CleanAdaptation>","Limpa os dados da adaptacao");
+			if(NetworkTool.getConnectionStatus(HomeActivity.this))
+			{
+				String jsonData = "{\n" +
+						"    \"clean\": \"true\"" +
+						"}";
+
+				this.expressMessage.post(Configs.SERVER_NAME, jsonData);
+				Log.i("<CleanAdaptation>", "Limpa os dados da adaptacao");
+			}
 	        
 		}catch(Exception e)
 			{

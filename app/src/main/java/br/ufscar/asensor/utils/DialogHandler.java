@@ -57,55 +57,59 @@ public class DialogHandler
 	public static void showInputDialog(final Activity context)
     {
         // obtem os dados do servidor
-        final Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_layout);
-        dialog.setTitle("Endereço do servidor:");
+        if(NetworkTool.getConnectionStatus(context))
+        {
+            final Dialog dialog = new Dialog(context);
+            dialog.setContentView(R.layout.dialog_layout);
+            dialog.setTitle("Endereço do servidor:");
 
-        Button button = (Button) dialog.findViewById(R.id.btnInputDialog);
-        button.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
+            Button button = (Button) dialog.findViewById(R.id.btnInputDialog);
+            button.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
 
-                EditText editText = (EditText)dialog.findViewById(R.id.serverURL);
-                Configs.SERVER_URL = editText.getText().toString();
-                Configs.SERVICE_URL = "http://" + Configs.SERVER_URL + "/SM/Library/Services/ExpressMessageService.php";
+                    EditText editText = (EditText) dialog.findViewById(R.id.serverURL);
+                    Configs.SERVER_URL = editText.getText().toString();
+                    Configs.SERVICE_URL = "http://" + Configs.SERVER_URL + "/SM/Library/Services/ExpressMessageService.php";
 
-                ExpressMessage expressmessage = new ExpressMessage("ASensor", Configs.SERVICE_URL);
+                    ExpressMessage expressmessage = new ExpressMessage("ASensor", Configs.SERVICE_URL);
 
-                if(expressmessage.isAlive())
-                {
-                    // obtem as informacoes do servidor para o sensor
-                    JSONObject json = expressmessage.getInfo();
+                    if (expressmessage.isAlive()) {
+                        // obtem as informacoes do servidor para o sensor
+                        JSONObject json = expressmessage.getInfo();
 
-                    try {
-                        Configs.SERVER_NAME = json.getString("appName");
-                        Configs.FIELDS = json.getJSONArray("requestedData");
+                        try {
+                            Configs.SERVER_NAME = json.getString("appName");
+                            Configs.FIELDS = json.getJSONArray("requestedData");
 
-                        // avisa o usuario do sucesso da operacao
-                        DialogHandler.createAlertDialog("Conexão com o servidor realizada com sucesso.",
-                                "Aviso:",context);
+                            // avisa o usuario do sucesso da operacao
+                            DialogHandler.createAlertDialog("Conexão com o servidor realizada com sucesso.",
+                                    "Aviso:", context);
 
-                    } catch (Exception e) {
-                        Log.e("<JSON_ERROR>", "Erro ao recuperar dados do servidor");
-                        dialog.dismiss();
-                    }
-                }else
-                    {
+                        } catch (Exception e) {
+                            Log.e("<JSON_ERROR>", "Erro ao recuperar dados do servidor");
+                            dialog.dismiss();
+                        }
+                    } else {
                         // avisa ao usuario da falha na operacao
                         DialogHandler.createAlertDialog("Verifique se o endereço foi informado " +
-                                "corretamente ou entre em contato com o desenvolvedor do projeto",
-                                "Erro ao acessar servidor:",context);
+                                        "corretamente ou entre em contato com o desenvolvedor do projeto",
+                                "Erro ao acessar servidor:", context);
 
                         // reseta os dados dos atributos estaticos da classe de configuracao
                         Configs.SERVER_URL = "";
                         Configs.SERVICE_URL = "";
                     }
 
-                dialog.dismiss();
+                    dialog.dismiss();
 
+                }
+            });
+
+            dialog.show();
+        }else
+            {
+                DialogHandler.createAlertDialog("Seu dispositivo não está conectado a uma rede","Sem conexão com a rede:", context);
             }
-        });
-
-        dialog.show();
     }
 
 
